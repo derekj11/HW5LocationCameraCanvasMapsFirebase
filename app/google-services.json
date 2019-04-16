@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "718539630032",
+    "firebase_url": "https://hw5lccmf.firebaseio.com",
+    "project_id": "hw5lccmf",
+    "storage_bucket": "hw5lccmf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718539630032:android:4bf4e6ca0cf52d15",
+        "android_client_info": {
+          "package_name": "com.example.hw5"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "718539630032-pkceve0p8bs608ien6gv1coc82hqqadd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1GWFv71c8x7Jc3raIQHquz8ziBTJr4-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "718539630032-pkceve0p8bs608ien6gv1coc82hqqadd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
