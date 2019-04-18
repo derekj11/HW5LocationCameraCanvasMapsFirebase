@@ -1,8 +1,7 @@
 package com.example.hw5
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.database.DatabaseReference
@@ -21,11 +20,12 @@ class MainActivity : AppCompatActivity() {
 
         database = FirebaseDatabase.getInstance().reference
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        fab.setOnClickListener {
+            captureLocation()
         }
     }
+
+    fun captureLocation() {}
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
