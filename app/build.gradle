@@ -33,11 +33,17 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
 
+    // firebase
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-database:16.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
+    //coroutine
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+
+    //location via Play Services
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 }
 
-// Add the following line to the bottom of the file:
-apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
