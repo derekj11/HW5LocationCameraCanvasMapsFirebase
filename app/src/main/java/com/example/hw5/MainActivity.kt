@@ -1,12 +1,17 @@
 package com.example.hw5
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.ResultReceiver
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -19,11 +24,17 @@ import kotlinx.coroutines.Job
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = MainActivity::class.java.simpleName
+
     // capture location
     private var corroutineJob: Job? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    var latlong: Location? = null
+    private var lastLocation: Location? = null
     lateinit var geocoder: Geocoder
+    private var addressOutput = ""
+
+    // result receiver
+    private lateinit var resultReceiver: AddressResultReceiver
 
     // firebase reference
     private lateinit var database: DatabaseReference
@@ -37,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        recyclerView = findViewById(R.id.recyclerView)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -54,7 +67,49 @@ class MainActivity : AppCompatActivity() {
         var coordinates: String
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location == null) {
+                Log.w(TAG, "onSuccess:null")
+                return@addOnSuccessListener
+            }
+
             coordinates = "${location?.latitude}, ${location?.longitude}"
+
+            lastLocation = location
+
+            // Determine whether a geocoder is available
+            if (!Geocoder.isPresent()) {
+                Toast.makeText(this@MainActivity, getString(R.string.no_geocoder_available), Toast.LENGTH_LONG).show()
+                return@addOnSuccessListener
+            }
+
+            startIntentService()
+        }
+    }
+
+    /**
+     * Creates an Intent, adds location data to it as an extra, and starts the intent serveice for
+     * fetching an address.
+     */
+    private fun startIntentService() {
+        // Create an intent for passing to the intent service responsible for fetching the address.
+        val intent = Intent(this, FetchAddressIntentService::class.java).apply {
+            // Pass the result receiver as an extra to the service.
+            putExtra(Constants.RECEIVER, resultReceiver)
+            // Pass the location data as an extra to the service.
+            putExtra(Constants.LOCATION_DATA_EXTRA, lastLocation)
+        }
+
+        // Start the service. If the service isn't already running, it is instantiated and started
+        // (creating a process for it if needed); if it is running then it remains running. The
+        // service kills itself automatically once all intents are processed.
+        startService(intent)
+    }
+
+    private inner class AddressResultReceiver internal constructor(
+        handler: Handler
+    ) : ResultReceiver(handler) {
+        override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+            addressOutput = resultData.getString(Constants.RESULT_DATA_KEY)
         }
     }
 
