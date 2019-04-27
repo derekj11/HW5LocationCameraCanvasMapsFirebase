@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         myDataset = ArrayList()
 
         viewManager = LinearLayoutManager(this)
-        viewAdapter = MyAdapter(myDataset)
+        viewAdapter = MyAdapter(myDataset!!)
 
         recyclerView = findViewById<RecyclerView>(R.id.recyclerView).apply {
             layoutManager = viewManager
