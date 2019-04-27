@@ -21,6 +21,9 @@ import com.google.firebase.database.FirebaseDatabase
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Job
+import java.sql.Timestamp
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,7 +34,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var lastLocation: Location? = null
     lateinit var geocoder: Geocoder
+    private var latlong: String = ""
     private var addressOutput = ""
+    private var now: String = ""
 
     // result receiver
     private lateinit var resultReceiver: AddressResultReceiver
@@ -71,7 +76,8 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     fun captureLocation() {
-        var coordinates: String
+
+        now = Calendar.getInstance().time.toGMTString()
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location == null) {
@@ -79,9 +85,8 @@ class MainActivity : AppCompatActivity() {
                 return@addOnSuccessListener
             }
 
-            coordinates = "${location?.latitude}, ${location?.longitude}"
-
             lastLocation = location
+            latlong = "Coordinates: <${location.latitude}, ${location.longitude}>"
 
             // Determine whether a geocoder is available
             if (!Geocoder.isPresent()) {
@@ -117,7 +122,14 @@ class MainActivity : AppCompatActivity() {
     ) : ResultReceiver(handler) {
         override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
             addressOutput = resultData?.getString(Constants.RESULT_DATA_KEY) ?: ""
+
+            addLocation()
         }
+    }
+
+    private fun addLocation() {
+        myDataset?.add(CapturedLocation(latlong, addressOutput, now))
+        viewAdapter.notifyDataSetChanged()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
