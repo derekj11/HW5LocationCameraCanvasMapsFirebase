@@ -79,6 +79,7 @@ class FetchAddressIntentService : IntentService("FetchAddress") {
 
     private fun deliverResultToReceiver(resultCode: Int, message: String) {
         val bundle = Bundle().apply { putString(Constants.RESULT_DATA_KEY, message) }
+        Log.d(TAG, message)
         receiver?.send(resultCode, bundle)
     }
 

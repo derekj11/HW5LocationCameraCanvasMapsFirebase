@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -48,17 +49,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
-    private var myDataset: ArrayList<CapturedLocation>? = null
+    private var myDataset: LinkedList<CapturedLocation> = LinkedList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        myDataset = ArrayList()
-
         viewManager = LinearLayoutManager(this)
-        viewAdapter = MyAdapter(myDataset!!)
+        viewAdapter = MyAdapter(myDataset)
 
         recyclerView = findViewById<RecyclerView>(R.id.recyclerView).apply {
             layoutManager = viewManager
@@ -66,10 +65,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        resultReceiver = AddressResultReceiver(Handler())
 
         database = FirebaseDatabase.getInstance().reference
 
+        val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                database.child(myDataset[viewHolder.adapterPosition].timeStamp!!).removeValue()
+
+                myDataset.removeAt(viewHolder.adapterPosition)
+                viewAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+            }
+
+        })
+        helper.attachToRecyclerView(recyclerView)
+
         fab.setOnClickListener {
+            Log.d(TAG, "fab clicked")
             captureLocation()
         }
     }
@@ -87,6 +108,7 @@ class MainActivity : AppCompatActivity() {
 
             lastLocation = location
             latlong = "Coordinates: <${location.latitude}, ${location.longitude}>"
+            Log.d(TAG, latlong)
 
             // Determine whether a geocoder is available
             if (!Geocoder.isPresent()) {
@@ -94,6 +116,7 @@ class MainActivity : AppCompatActivity() {
                 return@addOnSuccessListener
             }
 
+            Log.d(TAG, "startIntentService")
             startIntentService()
         }
     }
@@ -128,8 +151,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addLocation() {
-        myDataset?.add(CapturedLocation(latlong, addressOutput, now))
-        viewAdapter.notifyDataSetChanged()
+        Log.d(TAG, now)
+        myDataset.addLast(CapturedLocation(latlong, addressOutput, now))
+        database.child(now).setValue(myDataset.last)
+        recyclerView.adapter?.notifyItemInserted(myDataset.size)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -7,4 +7,7 @@
     <string name="no_address_found">Sorry, no address found</string>
     <string name="address_found">Address found</string>
     <string name="no_geocoder_available">No Geocoder available</string>
+    <string name="address"><![CDATA[<address>]]></string>
+    <string name="lat_long"><![CDATA[<lat, long>]]></string>
+    <string name="timestamp"><![CDATA[<timestamp>]]></string>
 </resources>
