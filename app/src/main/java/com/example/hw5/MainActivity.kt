@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         viewManager = LinearLayoutManager(this)
-        viewAdapter = MyAdapter(myDataset)
+        viewAdapter = MyAdapter(myDataset, this)
 
         recyclerView = findViewById<RecyclerView>(R.id.recyclerView).apply {
             layoutManager = viewManager
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             lastLocation = location
-            latlong = "Coordinates: <${location.latitude}, ${location.longitude}>"
+            latlong = "${location.latitude},${location.longitude}"
             Log.d(TAG, latlong)
 
             // Determine whether a geocoder is available

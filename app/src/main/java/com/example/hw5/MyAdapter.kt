@@ -1,15 +1,21 @@
 package com.example.hw5
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 
-class MyAdapter(private val myDataset: LinkedList<CapturedLocation>) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+class MyAdapter(private val myDataset: LinkedList<CapturedLocation>,
+                private val mContext: Context
+) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
-    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
         private val mCoordinates: TextView = itemView.findViewById(R.id.latlong)
         private val mAddress: TextView = itemView.findViewById(R.id.address)
@@ -29,6 +35,10 @@ class MyAdapter(private val myDataset: LinkedList<CapturedLocation>) : RecyclerV
 
         override fun onClick(v: View?) {
             // go to new screen with map
+            val gmmIntentUri: Uri = Uri.parse("geo:${mCoordinates.text}")
+            val mapIntent: Intent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+            mContext.startActivity(mapIntent)
         }
 
     }
